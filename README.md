@@ -3,6 +3,7 @@
 SmartSaveFolder changes the Save Game Location of No Man's Sky to be a local SAVEGAMES subfolder next to each NMS.exe Executable.
 
 Release page: https://nomansskyretro.com/smartsavefolder.php
+
 Reddit Thread: https://www.reddit.com/r/NMS_Foundations/comments/rr43q8/smartsavefolder_for_no_mans_sky_pc_solve_savegame/
 
 The program is functionally complete.

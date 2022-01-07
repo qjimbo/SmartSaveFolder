@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartSaveFolder", "SmartSaveFolder\SmartSaveFolder.csproj", "{C3E40BB0-2533-4B01-B6EE-8B4BD8F9AA3C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3E40BB0-2533-4B01-B6EE-8B4BD8F9AA3C}.Release|x64.ActiveCfg = Release|x64
+		{C3E40BB0-2533-4B01-B6EE-8B4BD8F9AA3C}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

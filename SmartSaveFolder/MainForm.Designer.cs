@@ -36,6 +36,7 @@
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.buttonExit = new System.Windows.Forms.Button();
             this.pictureBoxLink = new System.Windows.Forms.PictureBox();
+            this.chkStartup = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLink)).BeginInit();
             this.SuspendLayout();
             // 
@@ -98,11 +99,22 @@
             this.pictureBoxLink.Click += new System.EventHandler(this.pictureBoxLink_Click);
             this.pictureBoxLink.MouseHover += new System.EventHandler(this.pictureBoxLink_MouseHover);
             // 
+            // chkStartup
+            // 
+            this.chkStartup.AutoSize = true;
+            this.chkStartup.Location = new System.Drawing.Point(334, 159);
+            this.chkStartup.Name = "chkStartup";
+            this.chkStartup.Size = new System.Drawing.Size(93, 17);
+            this.chkStartup.TabIndex = 5;
+            this.chkStartup.Text = "Run at startup";
+            this.chkStartup.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(439, 189);
+            this.Controls.Add(this.chkStartup);
             this.Controls.Add(this.pictureBoxLink);
             this.Controls.Add(this.buttonExit);
             this.Controls.Add(this.textBox);
@@ -130,6 +142,7 @@
         private System.Windows.Forms.NotifyIcon notifyIcon;
         private System.Windows.Forms.Button buttonExit;
         private System.Windows.Forms.PictureBox pictureBoxLink;
+        private System.Windows.Forms.CheckBox chkStartup;
     }
 }
 

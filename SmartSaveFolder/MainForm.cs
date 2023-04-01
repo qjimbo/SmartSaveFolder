@@ -35,7 +35,7 @@ namespace SmartSaveFolder
             this.Invoke((MethodInvoker)delegate()
             {
                 textBox.AppendText("[" + date + "] " + text + Environment.NewLine);
-                File.AppendAllText("log.txt", "[" + date + "] " + text + Environment.NewLine);
+                File.AppendAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),"log.txt"), "[" + date + "] " + text + Environment.NewLine);
                 if (notify != "")
                     notifyIcon.ShowBalloonTip(1000, notify, text, ToolTipIcon.Info);
             });
@@ -45,6 +45,11 @@ namespace SmartSaveFolder
         {
             notifyIcon.Visible = true;
             oldSaveGamePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\HelloGames\\NMS";
+
+            // Run at Startup
+            var startupKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            chkStartup.Checked = startupKey.GetValue("SmartSaveFolder") != null;
+            chkStartup.CheckedChanged += chkStartup_CheckedChanged;
 
             // Wait
             watchForStart = Watcher.WatchForProcessStart("NMS.exe", NoMansSkyStarted);
@@ -182,29 +187,33 @@ namespace SmartSaveFolder
             // Process Result
             if (!hasPermission)
             {
-                WriteToLog("Warning: Current User does not have permission to create Symbolic Links.");
+                WriteToLog("Current User does not have permission to create Symbolic Links.");
 
                 var result = MessageBox.Show("SmartSaveFolder needs to grant the current user permission to create Symbolic Links in order to redirect the Save Games folder. Click OK to perform this step.", "First Time Setup", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
 
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
-                    // https://stackoverflow.com/a/73132512
+                    var programPath = Assembly.GetEntryAssembly().Location;
+                    var startInfo = new ProcessStartInfo(programPath)
+                    {
+                        Verb = "runas",
+                        Arguments = "-grantprivilege " + Environment.UserName,
+                        UseShellExecute = true,
+                    };
+                    WriteToLog("Please wait while permissions are changed.");
                     Process process = new Process();
-                    ProcessStartInfo startInfo = new ProcessStartInfo();
-                    startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    startInfo.FileName = "powershell.exe";
-                    startInfo.Arguments = "secedit /export /cfg c:\\secpol.cfg; (gc C:\\secpol.cfg).replace('SeCreateSymbolicLinkPrivilege = ', 'SeCreateSymbolicLinkPrivilege = " + Environment.UserName + ",') | Out-File C:\\secpol.cfg; secedit /configure /db c:\\windows\\security\\local.sdb /cfg c:\\secpol.cfg; rm -force c:\\secpol.cfg -confirm:$false";
-                    startInfo.CreateNoWindow = true;
-                    startInfo.Verb = "runas";
                     process.StartInfo = startInfo;
-                    process.Start();
+                    process.Start();                    
+                    process.WaitForExit();
+                    WriteToLog("Permissions update complete, restart required.");
 
                     result = MessageBox.Show("A restart is required to apply the permission change. Click OK to restart now or Cancel to restart later.", "Restart Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
 
-                    if (result == System.Windows.Forms.DialogResult.OK)                    
+                    if (result == System.Windows.Forms.DialogResult.OK)
                         Process.Start("shutdown.exe", "-r -t 5");
-                    
-                    Environment.Exit(0);
+
+                    WriteToLog("SmartSaveFolder will not work until system is rebooted.", "Permissions Required");
+                    return;
                 }
                 else
                 {
@@ -273,6 +282,31 @@ namespace SmartSaveFolder
         {
             ToolTip tt = new ToolTip();
             tt.SetToolTip(this.pictureBoxLink, "Visit NoMansSkyRetro.com");
+        }
+
+        private void chkStartup_CheckedChanged(object sender, EventArgs e)
+        {
+            var startupKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            try
+            {
+                if (chkStartup.Checked)
+                {
+                    // Add the program to the registry to run at startup with -minimized parameter
+                    startupKey.SetValue("SmartSaveFolder", Application.ExecutablePath + " -minimized");
+                    WriteToLog("SmartSaveFolder will launch at Windows Startup.");
+                }
+                else
+                {
+                    // Remove the program from the registry                
+                    startupKey.DeleteValue("SmartSaveFolder", false);
+                    WriteToLog("SmartSaveFolder will no longer launch at Windows Startup.");
+                }
+            }
+            catch
+            {
+                // Error updating registry
+                WriteToLog("SmartSaveFolder could not update registry.");
+            }
         }
 
     }

@@ -43,6 +43,12 @@ namespace SmartSaveFolder
             return Watcher;
         }
 
+        public static int GetProccessID(EventArrivedEventArgs e)
+        {
+            ManagementBaseObject targetInstance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
+            return Convert.ToInt32(targetInstance["ProcessId"]);
+        }
+
 
     }
 }

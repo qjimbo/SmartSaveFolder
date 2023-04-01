@@ -68,7 +68,6 @@ namespace SmartSaveFolder
             runningId = Watcher.GetProccessID(e);
 
             ManagementBaseObject targetInstance = (ManagementBaseObject)e.NewEvent.Properties["TargetInstance"].Value;
-            int id = Int32.Parse(((UInt32)targetInstance["ProcessId"]).ToString());
             string path = (string)targetInstance["ExecutablePath"];
             newSaveGamePath = Path.Combine(Path.GetDirectoryName(path), "SAVEGAMES");
 
@@ -76,7 +75,6 @@ namespace SmartSaveFolder
             bakSaveGamePath = oldSaveGamePath + ".bak";
             if (Directory.Exists(oldSaveGamePath) && !Directory.Exists(bakSaveGamePath))
             {
-
                     if(ForceMoveFolder.Execute(oldSaveGamePath, bakSaveGamePath))
                         WriteToLog("Moved Existing Save Games Folder");
                     else
@@ -88,7 +86,7 @@ namespace SmartSaveFolder
             // Create Symbolic Link Path
             if (!Directory.Exists(newSaveGamePath))
                 Directory.CreateDirectory(newSaveGamePath);
-            Directory.CreateDirectory(oldSaveGamePath);
+
             var success = SymbolicLink.Create(oldSaveGamePath,newSaveGamePath);
 
             // Create DefaultUser folder and any Steam User Folders if Found

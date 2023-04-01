@@ -18,10 +18,4 @@ Moving folders is done with Microsoft.VisualBasic.FileIO.FileSystem.MoveDirector
 
 Folders are replaced with Symbolic Links using Kernal32.dll's CreateSymbolicLink function.
 
-# Future Plans
-
-1) Don't require elevated permissions each time on launch, modify HelloGames folder permissions once as elevated so doesn't need elevated next time.
-2) Publisher sign the app so doesn't show "Unknown Publisher" on the UAC warning.
-3) Freeze NMS.exe process until folder rerouted to avoid issues with 1.09.1 and older versions that sometimes don't find the save file because it is not rerouted quickly enough.
-4) Multiple Save slots: o Default o Number
-5) SCREENSHOTS folder and customizable hotkey - idea: copy save game embedded in screenshot, allow loading a savegame from screenshot (copy files to SAVEGAMES_SCR, then close and restart NMS in "Screenshot Load Mode")
+On the first time running, the current user is granted permission to create Symbolic Links and a restart is required. As of v1.03, admin rights are no longer needed.

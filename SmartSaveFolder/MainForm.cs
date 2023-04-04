@@ -23,15 +23,18 @@ namespace SmartSaveFolder
         }
         public ManagementEventWatcher watchForStart;
         public ManagementEventWatcher watchForEnd;
+        public ManagementEventWatcher debugWatchForStart;
+        public ManagementEventWatcher debugWatchForEnd;
         public string oldSaveGamePath;
         public string bakSaveGamePath;
         public string newSaveGamePath;
         public bool closing = false;
         public int runningId = 0;
-        
+
         public void WriteToLog(string text, string notify = "")
         {
             string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
             this.Invoke((MethodInvoker)delegate()
             {
                 textBox.AppendText("[" + date + "] " + text + Environment.NewLine);
@@ -41,9 +44,13 @@ namespace SmartSaveFolder
             });
         }
 
-        private void MainForm_Shown(object sender, EventArgs e)
+
+        private void MainForm_Load(object sender, EventArgs e)
         {
+            // Try Icon
             notifyIcon.Visible = true;
+
+            // Save Game Path
             oldSaveGamePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\HelloGames\\NMS";
 
             // Run at Startup
@@ -54,12 +61,12 @@ namespace SmartSaveFolder
             // Wait
             watchForStart = Watcher.WatchForProcessStart("NMS.exe", NoMansSkyStarted);
             watchForEnd = Watcher.WatchForProcessEnd("NMS.exe", NoMansSkyClosed);
-            watchForStart = Watcher.WatchForProcessStart("XGOG Release_x64.exe", NoMansSkyStarted); // DEBUG VERSION
-            watchForEnd = Watcher.WatchForProcessEnd("XGOG Release_x64.exe", NoMansSkyClosed); // DEBUG VERSION
+            debugWatchForStart = Watcher.WatchForProcessStart("XGOG Release_x64.exe", NoMansSkyStarted); // DEBUG VERSION
+            debugWatchForEnd = Watcher.WatchForProcessEnd("XGOG Release_x64.exe", NoMansSkyClosed); // DEBUG VERSION
             WriteToLog("Waiting for No Man's Sky to Start");
 
             // Verify Symbolic Link Permissions      
-            VerifyPermissions(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\HelloGames");    
+            VerifyPermissions(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\HelloGames");
         }
 
         private void NoMansSkyStarted(object sender, EventArrivedEventArgs e)
@@ -244,6 +251,14 @@ namespace SmartSaveFolder
         private void buttonExit_Click(object sender, EventArgs e)
         {
             closing = true;
+            watchForStart.Stop();
+            watchForStart.Dispose();
+            watchForEnd.Stop();
+            watchForEnd.Dispose();
+            debugWatchForStart.Stop();
+            debugWatchForStart.Dispose();
+            debugWatchForEnd.Stop();
+            debugWatchForEnd.Dispose();
             Application.Exit();
         }
 
@@ -308,6 +323,7 @@ namespace SmartSaveFolder
                 WriteToLog("SmartSaveFolder could not update registry.");
             }
         }
+
 
     }
 }

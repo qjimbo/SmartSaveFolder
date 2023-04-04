@@ -37,6 +37,7 @@
             this.buttonExit = new System.Windows.Forms.Button();
             this.pictureBoxLink = new System.Windows.Forms.PictureBox();
             this.chkStartup = new System.Windows.Forms.CheckBox();
+            this.lblVersion = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLink)).BeginInit();
             this.SuspendLayout();
             // 
@@ -102,18 +103,28 @@
             // chkStartup
             // 
             this.chkStartup.AutoSize = true;
-            this.chkStartup.Location = new System.Drawing.Point(334, 159);
+            this.chkStartup.Location = new System.Drawing.Point(334, 162);
             this.chkStartup.Name = "chkStartup";
             this.chkStartup.Size = new System.Drawing.Size(93, 17);
             this.chkStartup.TabIndex = 5;
             this.chkStartup.Text = "Run at startup";
             this.chkStartup.UseVisualStyleBackColor = true;
             // 
+            // lblVersion
+            // 
+            this.lblVersion.AutoSize = true;
+            this.lblVersion.Location = new System.Drawing.Point(39, 163);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(34, 13);
+            this.lblVersion.TabIndex = 6;
+            this.lblVersion.Text = "v1.05";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(439, 189);
+            this.Controls.Add(this.lblVersion);
             this.Controls.Add(this.chkStartup);
             this.Controls.Add(this.pictureBoxLink);
             this.Controls.Add(this.buttonExit);
@@ -126,7 +137,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SmartSaveFolder for No Man\'s Sky";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
-            this.Shown += new System.EventHandler(this.MainForm_Shown);
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLink)).EndInit();
             this.ResumeLayout(false);
@@ -143,6 +154,7 @@
         private System.Windows.Forms.Button buttonExit;
         private System.Windows.Forms.PictureBox pictureBoxLink;
         private System.Windows.Forms.CheckBox chkStartup;
+        private System.Windows.Forms.Label lblVersion;
     }
 }
 

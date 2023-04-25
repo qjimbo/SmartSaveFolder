@@ -17,6 +17,42 @@ namespace SmartSaveFolder
 {
     public class Watcher
     {
+        public static void CleanupOrphanedWatchers(string ProcessName)
+        {            
+            string startQuery = "SELECT TargetInstance" +
+                           " FROM __InstanceCreationEvent " + "WITHIN  2 " +
+                           " WHERE TargetInstance ISA 'Win32_Process' " +
+                           " AND TargetInstance.Name = '" + ProcessName + "'";
+            string endQuery = "SELECT TargetInstance" +
+                           " FROM __InstanceDeletionEvent " + "WITHIN  2 " +
+                           " WHERE TargetInstance ISA 'Win32_Process' " +
+                           " AND TargetInstance.Name = '" + ProcessName + "'";
+            string scope = "\\\\.\\root\\CIMV2";
+
+            // Find all instances of ManagementEventWatcher that were created using the same query and scope
+            var startWatchers = System.AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => typeof(ManagementEventWatcher).IsAssignableFrom(p))
+                .Select(x => (ManagementEventWatcher)Activator.CreateInstance(x))
+                .Where(w => w.Query.QueryString == startQuery && w.Scope.Path.Path == scope).ToList();
+
+            var endWatchers = System.AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => typeof(ManagementEventWatcher).IsAssignableFrom(p))
+                .Select(x => (ManagementEventWatcher)Activator.CreateInstance(x))
+                .Where(w => w.Query.QueryString == endQuery && w.Scope.Path.Path == scope).ToList();
+
+            var watchers = new List<ManagementEventWatcher>();
+            watchers.AddRange(startWatchers);
+            watchers.AddRange(endWatchers);
+            // Stop and dispose of each watcher
+            foreach (var watcher in watchers)
+            {
+                watcher.Stop();
+                watcher.Dispose();
+            }
+        }
+
         public static ManagementEventWatcher WatchForProcessStart(string ProcessName, EventArrivedEventHandler Callback)
         {
             string Query = "SELECT TargetInstance" +

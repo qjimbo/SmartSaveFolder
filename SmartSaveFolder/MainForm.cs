@@ -59,6 +59,8 @@ namespace SmartSaveFolder
             chkStartup.CheckedChanged += chkStartup_CheckedChanged;
 
             // Wait
+            Watcher.CleanupOrphanedWatchers("NMS.exe");
+            Watcher.CleanupOrphanedWatchers("XGOG Release_x64.exe");
             watchForStart = Watcher.WatchForProcessStart("NMS.exe", NoMansSkyStarted);
             watchForEnd = Watcher.WatchForProcessEnd("NMS.exe", NoMansSkyClosed);
             debugWatchForStart = Watcher.WatchForProcessStart("XGOG Release_x64.exe", NoMansSkyStarted); // DEBUG VERSION
@@ -79,8 +81,8 @@ namespace SmartSaveFolder
             WriteToLog("No Man's Sky Started (SmartSaveFolder cannot exit while NMS is running)");
             runningId = Watcher.GetProccessID(e);
 
-            ManagementBaseObject targetInstance = (ManagementBaseObject)e.NewEvent.Properties["TargetInstance"].Value;
-            string path = (string)targetInstance["ExecutablePath"];
+            string path = Process.GetProcessById(runningId).MainModule.FileName;
+
             newSaveGamePath = Path.Combine(Path.GetDirectoryName(path), "SAVEGAMES");
 
             // Move Existing Save Games Path

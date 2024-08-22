@@ -82,24 +82,9 @@ namespace SmartSaveFolder
         public static ProcessInfo GetProcessInfo(EventArrivedEventArgs e)
         {
             ManagementBaseObject targetInstance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
-            var processId = Convert.ToInt32(targetInstance["ProcessId"]);
-            string executablePath = string.Empty;
-            try
-            {
-                using (var searcher = new ManagementObjectSearcher("SELECT ExecutablePath FROM Win32_Process WHERE ProcessId = " + processId))
-                using (var objects = searcher.Get())
-                {
-                    var result = objects.Cast<ManagementObject>().FirstOrDefault();
-                    if(result != null)
-                    {
-                        executablePath = result["ExecutablePath"].ToString();
-                    }
-                }
-            }
-            catch
-            {
-                // Failure
-            }
+            uint processId = Convert.ToUInt32(targetInstance["ProcessId"]);
+            string executablePath = ProcessAPI.GetProcessPath(processId);
+            
 
             return new ProcessInfo
             {

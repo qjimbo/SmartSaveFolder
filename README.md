@@ -25,7 +25,7 @@ You can close and open different No Man's Sky installations and leave SmartSaveF
 
 ## Download
 
-[Download SmartSaveFolder v1.06](https://github.com/qjimbo/smartsavefolder/releases/latest)
+[Download Latest Release of SmartSaveFolder](https://github.com/qjimbo/smartsavefolder/releases/latest)
 
 ## Source Code
 

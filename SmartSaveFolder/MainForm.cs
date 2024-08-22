@@ -73,29 +73,65 @@ namespace SmartSaveFolder
 
         private void NoMansSkyStarted(object sender, EventArrivedEventArgs e)
         {
+            var processInfo = Watcher.GetProcessInfo(e);
+            WriteToLog("No Man's Sky Started with Process ID [" + processInfo.ProcessId + "]");
+
             if (runningId != 0)
             {
                 WriteToLog("Multiple instances of No Man's Sky Detected. Please only run a single No Man's Sky instance at a time.", "Multiple Instances Alert");
                 return;
             }
-            WriteToLog("No Man's Sky Started (SmartSaveFolder cannot exit while NMS is running)");
-            runningId = Watcher.GetProccessID(e);
 
-            string path = Process.GetProcessById(runningId).MainModule.FileName;
+            runningId = processInfo.ProcessId;
+
+            WriteToLog("No Man's Sky Started (SmartSaveFolder cannot exit while NMS is running - DEBUG VERSION)");
+
+            Process process = null;
+            WriteToLog("Verify Process...");
+            try
+            {
+                process = Process.GetProcessById(runningId);
+                WriteToLog(" * => OK");
+            }
+            catch
+            {
+                // Not running
+                WriteToLog(" * => Process not Found");
+            }
+            if (process == null)
+            {
+                WriteToLog("Process no longer found, not continuing and marking game as closed.");
+                runningId = 0;
+                return;
+            }
+            
+            string path = processInfo.ExecutablePath;
+            WriteToLog("Executable Path: " + path);
 
             newSaveGamePath = Path.Combine(Path.GetDirectoryName(path), "SAVEGAMES");
 
             // Move Existing Save Games Path
             bakSaveGamePath = oldSaveGamePath + ".bak";
-            if (Directory.Exists(oldSaveGamePath) && !Directory.Exists(bakSaveGamePath))
+
+            WriteToLog("Verifying if Old Save Game Path '" + oldSaveGamePath + "' exists...");
+            var oldSaveGamePathExists = Directory.Exists(oldSaveGamePath);
+            WriteToLog(" * => " + oldSaveGamePathExists);
+
+            WriteToLog("Verifying if Backup Save Game Path '" + bakSaveGamePath + "' does not already exist...");
+            var bakSaveGamePathExists = Directory.Exists(bakSaveGamePath);
+            WriteToLog(" * => " + bakSaveGamePathExists);
+
+            if (oldSaveGamePathExists && !bakSaveGamePathExists)
             {
-                    if(ForceMoveFolder.Execute(oldSaveGamePath, bakSaveGamePath))
-                        WriteToLog("Moved Existing Save Games Folder");
-                    else
-                    {
-                        WriteToLog("Unable to move existing Save Games Folder, please make sure you have no files or explorer windows open.","SmartSaveFolder Error");
-                        return;
-                    }                
+                WriteToLog("Moving Existing Save Games Folder...");
+                if(ForceMoveFolder.Execute(oldSaveGamePath, bakSaveGamePath))
+                    WriteToLog(" * => OK");
+                else
+                {
+                    WriteToLog(" * => Error");
+                    WriteToLog("Unable to move existing Save Games Folder, please make sure you have no files or explorer windows open.","SmartSaveFolder Error");
+                    return;
+                }                
             }
             // Create Symbolic Link Path
             if (!Directory.Exists(newSaveGamePath))
@@ -137,9 +173,19 @@ namespace SmartSaveFolder
         private void NoMansSkyClosed(object sender, EventArrivedEventArgs e)
         {            
             // Verify ID of Closed Process
-            int closedId = Watcher.GetProccessID(e);
-            if (runningId != closedId)
+            var processInfo = Watcher.GetProcessInfo(e);
+            WriteToLog("No Man's Sky Closed with Process ID [" + processInfo.ProcessId + "]");
+
+            WriteToLog("Verifying Closed Process ID [" + processInfo.ProcessId + "] matches Running Process ID [" + runningId + "]...");
+            if (runningId != processInfo.ProcessId)
+            {
+                WriteToLog("* => No Match");
                 return;
+            }
+            else
+            {
+                WriteToLog("* => Match");
+            }
 
             WriteToLog("No Man's Sky Closed");   
             runningId = 0;
